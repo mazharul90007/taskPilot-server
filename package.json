@@ -1,0 +1,31 @@
+{
+  "name": "taskpilot-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mazharul90007/taskPilot-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mazharul90007/taskPilot-server/issues"
+  },
+  "homepage": "https://github.com/mazharul90007/taskPilot-server#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "prisma": "^6.9.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  }
+}
