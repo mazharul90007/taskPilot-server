@@ -1,27 +1,26 @@
-
+// user.controller.ts
 import { Request, Response } from 'express';
-import * as userService from '../users/user.service';
-import jwt from 'jsonwebtoken';
+import { createUser } from '../users/user.service';
+import catchAsync from '../../shared/catchAsync';
 
-export const registerUser = async (req: Request, res: Response) => {
-  try {
-    const user = await userService.createUser(req.body);
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(400).json({ error: 'Failed to register user' });
+
+const registerUser = catchAsync(async (req: Request, res: Response) => {
+  const { email, password, username, role } = req.body;
+
+  if (!email || !password || !username) {
+    return res.status(400).json({ error: 'Missing required fields' });
   }
-};
 
-export const loginUser = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
-    const user = await userService.validateUser(email, password);
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    const user = await createUser({ email, password, username, role });
+    return res.status(201).json(user);
+  } catch (error: any) {
+    if (error.message.includes('User already exists')) {
+      return res.status(409).json({ error: error.message });
     }
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '1d' });
-    res.json({ user, token });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to login' });
+    throw error; 
   }
-};
+});
+
+
+export const UserController = { registerUser };

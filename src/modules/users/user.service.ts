@@ -1,23 +1,23 @@
-// Path: server/src/services/userService.ts
-import { prisma } from '../../config/database';
-import { User } from '../../types';
+
+import { userModel } from './user.model';
 import bcrypt from 'bcrypt';
 
-export const createUser = async (data: User) => {
-  const hashedPassword = await bcrypt.hash(data.password, 10);
-  return prisma.user.create({
-    data: {
-      username: data.username,
-      email: data.email,
-      password: hashedPassword,
-      role: data.role,
-    },
-  });
-};
+export const createUser = async (data: {
+  email: string;
+  password: string;
+  username: string;
+  role?: string;
+}) => {
+  const existingUser = await userModel.findByEmailOrUsername(data.email, data.username);
+  if (existingUser) {
+    throw new Error('User already exists with this email or username');
+  }
 
-export const validateUser = async (email: string, password: string) => {
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return null;
-  const isValid = await bcrypt.compare(password, user.password);
-  return isValid ? user : null;
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+  return userModel.createUser({
+    email: data.email,
+    password: hashedPassword,
+    username: data.username,
+    role: data.role,
+  });
 };

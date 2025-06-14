@@ -21,7 +21,7 @@ export interface Project {
   note?: string;
 }
 
-export interface User {
+export interface UserInput {
   username: string;
   email: string;
   password: string;
@@ -49,3 +49,5 @@ export interface ActivityLog {
   performedById: string;
   timestamp: Date;
 }
+
+
