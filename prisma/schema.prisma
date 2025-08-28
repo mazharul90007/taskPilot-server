@@ -1,0 +1,80 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+model Project {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  projectId       String    @unique
+  station         String
+  deadline        DateTime?
+  value           Float
+  team            String
+  uiUx            String?
+  frontend        String?
+  backend         String?
+  lastUpdate      DateTime?
+  lastMeeting     DateTime?
+  projectStatus   String
+  esteemedDelivery String?
+  clientStatus    String?
+  rating          Int?
+  figmaLink       String?
+  liveLink        String?
+  deliveredDate   DateTime?
+  requirements    String?
+  note            String?
+  tasks           Task[]
+  activityLogs    ActivityLog[]
+  messages        Message[]
+  clientId        String?   @db.ObjectId
+  client          User?     @relation(fields: [clientId], references: [id])
+}
+
+model User {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  username        String    @unique
+  email           String    @unique
+  password        String
+  role            String    // Leader, Co-Leader, Member, Client
+  projects        Project[] @relation
+  tasks           Task[]    @relation("AssignedTasks")
+  messages        Message[] @relation("SentMessages")
+  activityLogs    ActivityLog[] @relation("PerformedActions")
+}
+
+model Task {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  projectId       String    @db.ObjectId
+  project         Project   @relation(fields: [projectId], references: [id])
+  title           String
+  assignedToId    String?   @db.ObjectId
+  assignedTo      User?     @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  status          String    // To-Do, In Progress, Done
+  deadline        DateTime?
+}
+
+model Message {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  projectId       String    @db.ObjectId
+  project         Project   @relation(fields: [projectId], references: [id])
+  senderId        String    @db.ObjectId
+  sender          User      @relation("SentMessages", fields: [senderId], references: [id])
+  content         String
+  timestamp       DateTime  @default(now())
+}
+
+model ActivityLog {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  projectId       String    @db.ObjectId
+  project         Project   @relation(fields: [projectId], references: [id])
+  action          String
+  performedById   String    @db.ObjectId
+  performedBy     User      @relation("PerformedActions", fields: [performedById], references: [id])
+  timestamp       DateTime  @default(now())
+}
